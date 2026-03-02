@@ -3,148 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pyro | Zero Trace Vault</title>
+    <title>Pyro | Local Research OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { background-color: #020302; color: #e5e5e5; font-family: 'Inter', sans-serif; position: relative; overflow-x: hidden; }
-        .pyro-card { background: rgba(10, 18, 10, 0.95); transition: all 0.4s ease; backdrop-filter: blur(15px); border: 1px solid #1a2e1a; }
-        .pyro-card:hover { border-color: #10b981; transform: scale(1.02); }
-        .solution-box { background-color: #000; border: 1px solid #064e3b; position: relative; }
-        .locked-overlay { background: rgba(0,0,0,0.98); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 0.75rem; }
-        .pyro-watermark {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg);
-            font-size: 35vw; font-weight: 900; color: rgba(16, 185, 129, 0.08);
-            text-transform: uppercase; pointer-events: none; z-index: 0; white-space: nowrap;
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap');
+        
+        :root { --primary: #00ff88; --bg-dark: #020302; }
+        .dark { background-color: var(--bg-dark); color: #f8fafc; }
+        .light { background-color: #f0f4f0; color: #0f172a; }
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s; min-height: 100vh; overflow-x: hidden; }
+
+        .bg-watermark {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 20vw; font-weight: 900; letter-spacing: -0.06em;
+            pointer-events: none; z-index: 0; text-transform: uppercase;
+            background: linear-gradient(180deg, #00ff88 0%, #00e0ff 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: neural-pulse 10s ease-in-out infinite;
         }
+        @keyframes neural-pulse {
+            0%, 100% { opacity: 0.05; filter: blur(10px); transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.12; filter: blur(5px); transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        .glass-panel { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .light .glass-panel { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.05); }
+
+        .project-card { transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1); }
+        .project-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 40px -20px rgba(0, 255, 136, 0.3); }
+
+        .archive-item { cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 8px; font-size: 11px; color: #94a3b8; }
+        .archive-item:hover { background: rgba(0, 255, 136, 0.1); color: var(--primary); border-left: 3px solid var(--primary); }
+        
+        .status-active { color: #00e0ff; background: rgba(0, 224, 255, 0.1); border: 1px solid rgba(0, 224, 255, 0.2); }
+        .status-pending { color: #ffb800; background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.2); }
+        .status-completed { color: #00ff88; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.2); }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="dark">
 
-    <div class="pyro-watermark">PYRO</div>
+    <div class="bg-watermark">PYRO</div>
 
-    <nav class="relative border-b border-emerald-900/40 p-6 flex flex-wrap justify-between items-center bg-black/95 sticky top-0 z-50 backdrop-blur-md">
-        <div>
-            <h1 class="text-4xl font-black tracking-tighter text-emerald-500 italic leading-none">PYRO</h1>
-            <p id="stats" class="text-[10px] tracking-[0.3em] text-emerald-800 font-bold mt-1">PROTOCOL: SECURE</p>
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[999] opacity-0 pointer-events-none transition-all duration-500"></div>
+
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-96 glass-panel -translate-x-full transition-transform duration-500 z-[1000] flex flex-col">
+        <div class="p-8 border-b border-white/5 bg-white/5">
+            <div class="flex items-center justify-between">
+                <h2 class="font-black text-2xl text-[#00ff88]">RESEARCH_CORE</h2>
+                <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white">&times;</button>
+            </div>
         </div>
-        <div class="flex items-center gap-3">
-            <input type="text" id="searchInput" oninput="renderProjects()" placeholder="Filter..." class="bg-zinc-900 border border-emerald-900/50 px-4 py-2 rounded-lg text-sm outline-none w-32 sm:w-48 focus:border-emerald-500">
-            <button onclick="exportToPDF()" class="text-emerald-500 text-sm font-bold px-3">PDF</button>
-            <button onclick="toggleModal(true)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg">+ NEW</button>
+        <div class="flex-grow overflow-y-auto p-6 space-y-6">
+            <section>
+                <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-4 border-b border-emerald-500/20 pb-2">Genetic Templates</p>
+                <div class="grid grid-cols-1 gap-1">
+                    <div class="archive-item" onclick="quickLoad('Neural Mycelium', 'Interfacing gray matter with planetary fungal networks.')">Mycelium Brain Link</div>
+                    <div class="archive-item" onclick="quickLoad('Chlorophyll Dermis', 'Photosynthetic skin grafting for solar energy.')">Photosynthetic Skin</div>
+                    <div class="archive-item" onclick="quickLoad('Telomere Scrub', 'Nanobots engineered to freeze biological age.')">Age Stasis Protocol</div>
+                </div>
+            </section>
+            <section>
+                <p class="text-[9px] font-black text-cyan-400 uppercase tracking-widest mb-4 border-b border-cyan-400/20 pb-2">Quantum Templates</p>
+                <div class="grid grid-cols-1 gap-1">
+                    <div class="archive-item" onclick="quickLoad('Tachyon Scan', 'Receiving data from 5 minutes in the future.')">Pre-Event Visualizer</div>
+                    <div class="archive-item" onclick="quickLoad('Gravity Anchor', 'Bending space-time for artificial 1G.')">Spatial Anchor</div>
+                </div>
+            </section>
+        </div>
+        <div class="p-8 border-t border-white/5">
+            <h4 id="sideCount" class="text-4xl font-black text-[#00ff88]">0</h4>
+            <p class="text-[8px] text-slate-500 uppercase mt-1">Modules in Local Storage</p>
+        </div>
+    </aside>
+
+    <nav class="sticky top-0 z-50 p-6">
+        <div class="max-w-7xl mx-auto glass-panel rounded-3xl p-4 px-8 flex items-center justify-between shadow-2xl">
+            <button onclick="toggleSidebar()" class="group space-y-2">
+                <div class="w-8 h-0.5 bg-[#00ff88] transition-all group-hover:w-10 shadow-[0_0_10px_#00ff88]"></div>
+                <div class="w-10 h-0.5 bg-slate-500"></div>
+            </button>
+            <h1 class="text-2xl font-black text-[#00ff88] italic">PYRO OS</h1>
+            <div class="flex items-center gap-6">
+                <p id="clock" class="text-xl font-black text-white font-mono hidden md:block">00:00:00</p>
+                <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-xl">☀️</button>
+                <button onclick="toggleModal(true)" class="bg-[#00ff88] text-black px-8 py-3 rounded-2xl font-black text-xs uppercase shadow-lg hover:scale-105 transition-all">Initialize</button>
+            </div>
         </div>
     </nav>
 
-    <main class="relative p-6 max-w-7xl mx-auto z-10">
-        <div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    <main class="relative z-10 max-w-7xl mx-auto p-8 pt-16">
+        <h2 class="text-8xl font-black tracking-tighter mb-20 leading-[0.8]">The<br>Registry.</h2>
+        <div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 pb-32"></div>
     </main>
 
-    <button onclick="selfDestruct()" class="fixed bottom-6 right-6 z-50 bg-red-950/20 hover:bg-red-600 text-red-900 hover:text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-red-900/50">
-        Self Destruct
-    </button>
-
-    <div id="addModal" class="hidden fixed inset-0 bg-black/98 flex items-center justify-center p-4 z-[100]">
-        <div class="bg-zinc-900 w-full max-w-2xl p-8 rounded-3xl border border-emerald-600/30">
-            <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-tight">New Entry</h2>
-            <div class="grid gap-4">
-                <input id="projTitle" type="text" placeholder="Title" class="w-full bg-black border border-zinc-800 p-4 rounded-xl text-white outline-none">
-                <div class="flex gap-4">
-                    <select id="projTag" class="flex-grow bg-black border border-zinc-800 p-4 rounded-xl text-emerald-500 outline-none">
-                        <option value="Source Code">Source Code</option>
-                        <option value="Logic">Logic</option>
-                        <option value="Design">Design</option>
-                    </select>
-                    <div class="flex items-center gap-2 bg-black border border-zinc-800 px-4 rounded-xl">
-                        <input type="checkbox" id="projLocked" class="accent-emerald-500">
-                        <label class="text-[10px] text-zinc-500 uppercase font-bold">Lock</label>
-                    </div>
+    <div id="addModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-3xl flex items-center justify-center p-4 z-[2000]">
+        <div class="glass-panel w-full max-w-2xl p-12 rounded-[3rem] border-white/10">
+            <h2 class="text-3xl font-black text-white mb-8 italic">New Registry Entry</h2>
+            <div class="space-y-6">
+                <input id="projTitle" type="text" placeholder="Module Identifier" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl outline-none focus:border-[#00ff88] text-white font-bold">
+                <div id="statusPicker" class="grid grid-cols-3 gap-4">
+                    <button onclick="setStatus('Active', this)" class="p-4 rounded-2xl border border-[#00ff88] text-[10px] font-black uppercase bg-[#00ff88]/10 text-[#00ff88]">Active</button>
+                    <button onclick="setStatus('Pending', this)" class="p-4 rounded-2xl border border-white/5 text-[10px] font-black uppercase">Pending</button>
+                    <button onclick="setStatus('Completed', this)" class="p-4 rounded-2xl border border-white/5 text-[10px] font-black uppercase">Secured</button>
                 </div>
-                <textarea id="projSolution" placeholder="Data..." rows="8" class="w-full bg-black border border-zinc-800 p-4 rounded-xl font-mono text-emerald-400 outline-none"></textarea>
+                <textarea id="projSolution" placeholder="System strings..." rows="5" class="w-full bg-white/5 border border-white/10 p-5 rounded-2xl font-mono text-xs text-[#00ff88] outline-none"></textarea>
             </div>
-            <div class="flex gap-4 mt-8">
-                <button onclick="saveProject()" class="flex-1 bg-emerald-600 p-4 rounded-xl font-bold text-white uppercase italic">Burn to Vault</button>
-                <button onclick="toggleModal(false)" class="px-6 text-zinc-500 font-bold uppercase text-xs">Abort</button>
+            <div class="mt-12 flex gap-4">
+                <button onclick="toggleModal(false)" class="flex-1 text-slate-500 font-black py-6 uppercase text-xs">Abort</button>
+                <button onclick="saveProject()" class="flex-[2] bg-[#00ff88] text-black font-black py-6 rounded-3xl uppercase tracking-widest shadow-2xl hover:scale-[1.02] transition-all">Save to Folder</button>
             </div>
         </div>
     </div>
 
     <script>
-        let projects = JSON.parse(localStorage.getItem('pyro_secure_v3')) || [];
-        let masterKey = localStorage.getItem('pyro_master_v3') || null;
+        // --- LOCAL PERMANENT STORAGE SYSTEM ---
+        let projects = JSON.parse(localStorage.getItem('pyro_registry')) || [];
+        let selectedStatus = 'Active';
 
-        function toggleModal(show) { document.getElementById('addModal').classList.toggle('hidden', !show); }
-
-        function renderProjects() {
-            const container = document.getElementById('projectContainer');
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = projects.filter(p => p.title.toLowerCase().includes(searchTerm));
-            document.getElementById('stats').innerText = `${projects.length} RECORDS STORED`;
-
-            container.innerHTML = filtered.map((p, index) => `
-                <div class="pyro-card p-6 rounded-2xl flex flex-col h-full">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <span class="text-[9px] px-2 py-0.5 rounded border border-emerald-900 text-emerald-500 font-black uppercase mb-1 inline-block">${p.tag}</span>
-                            <h3 class="text-xl font-bold text-white">${p.title}</h3>
-                        </div>
-                        <button onclick="deleteProject(${index})" class="text-zinc-800 hover:text-red-500 text-xs font-bold">DELETE</button>
-                    </div>
-                    <div class="solution-box p-4 rounded-xl text-zinc-300 font-mono text-xs overflow-auto h-48 whitespace-pre-wrap flex-grow">
-                        ${p.locked ? `<div class="locked-overlay" id="lock-${index}"><button onclick="unlockProject(${index})" class="text-emerald-500 text-[10px] font-bold uppercase border border-emerald-900/50 px-4 py-2 rounded-lg hover:bg-emerald-500 hover:text-black">Unlock</button></div>` : ''}
-                        ${p.solution}
-                    </div>
-                </div>
-            `).join('');
-        }
+        // Initialize and Render on load
+        window.onload = () => { render(); updateClock(); };
 
         function saveProject() {
             const title = document.getElementById('projTitle').value;
             const solution = document.getElementById('projSolution').value;
-            const tag = document.getElementById('projTag').value;
-            const locked = document.getElementById('projLocked').checked;
-
             if(title && solution) {
-                if(locked && !masterKey) {
-                    masterKey = prompt("Set Master Key:");
-                    if(!masterKey) return;
-                    localStorage.setItem('pyro_master_v3', masterKey);
-                }
-                projects.unshift({ title, solution, tag, locked });
-                syncData();
+                const newModule = {
+                    id: Date.now().toString(),
+                    title,
+                    solution,
+                    status: selectedStatus,
+                    date: new Date().getTime()
+                };
+                projects.unshift(newModule); // Add to start of array
+                localStorage.setItem('pyro_registry', JSON.stringify(projects)); // PERMANENT SAVE
+                render();
                 toggleModal(false);
-                document.getElementById('projTitle').value = '';
+                document.getElementById('projTitle').value = ''; 
                 document.getElementById('projSolution').value = '';
-                document.getElementById('projLocked').checked = false;
             }
         }
 
-        function unlockProject(index) {
-            if(prompt("Enter Key:") === masterKey) document.getElementById(`lock-${index}`).remove();
-            else alert("DENIED");
+        function render() {
+            const container = document.getElementById('projectContainer');
+            document.getElementById('sideCount').innerText = projects.length;
+            
+            if(projects.length === 0) {
+                container.innerHTML = `<p class="col-span-3 text-center py-20 text-slate-700 italic">No modules detected in local directory.</p>`;
+                return;
+            }
+
+            container.innerHTML = projects.map(p => `
+                <div class="project-card glass-panel p-10 rounded-[2.5rem] flex flex-col h-full group relative overflow-hidden">
+                    <button onclick="deleteItem('${p.id}')" class="absolute top-8 right-8 opacity-0 group-hover:opacity-100 text-red-500 font-black transition-all">&times;</button>
+                    <div class="flex flex-col gap-4 mb-8">
+                        <span class="text-[9px] font-black px-3 py-1 rounded-full status-${p.status.toLowerCase()} w-max uppercase tracking-widest">● ${p.status}</span>
+                        <h3 class="text-3xl font-black tracking-tighter uppercase text-white">${p.title}</h3>
+                    </div>
+                    <div class="bg-black/50 border border-emerald-500/10 p-6 rounded-3xl font-mono text-[11px] leading-relaxed text-slate-400 flex-grow mb-6">
+                        <span class="text-[#00ff88]">LOC_OUT>></span> ${p.solution}
+                    </div>
+                    <p class="text-[8px] font-black text-slate-600 uppercase tracking-widest">Saved to Local Dir: ${new Date(p.date).toLocaleDateString()}</p>
+                </div>`).join('');
         }
 
-        function selfDestruct() {
-            if(confirm("CRITICAL: Wipe all vault data?")) {
-                if(prompt("Enter Master Key to Confirm:") === masterKey || !masterKey) {
-                    localStorage.removeItem('pyro_secure_v3');
-                    localStorage.removeItem('pyro_master_v3');
-                    location.reload();
-                } else {
-                    alert("AUTHORIZATION FAILED");
-                }
+        function deleteItem(id) {
+            if(confirm("Wipe this module from disk?")) {
+                projects = projects.filter(p => p.id !== id);
+                localStorage.setItem('pyro_registry', JSON.stringify(projects));
+                render();
             }
         }
 
-        function exportToPDF() {
-            const el = document.createElement('div');
-            el.innerHTML = projects.map(p => `<div><h2>${p.title}</h2><p>${p.locked ? 'ENCRYPTED' : p.solution}</p></div>`).join('');
-            html2pdf().from(el).set({ filename: 'Pyro-Vault-Dump.pdf' }).save();
+        // --- UI HELPERS ---
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('sidebarOverlay').classList.toggle('opacity-0');
+            document.getElementById('sidebarOverlay').classList.toggle('pointer-events-none');
         }
-
-        function deleteProject(index) { if(confirm("Delete?")) { projects.splice(index, 1); syncData(); } }
-        function syncData() { localStorage.setItem('pyro_secure_v3', JSON.stringify(projects)); renderProjects(); }
-        renderProjects();
+        function toggleModal(s) { document.getElementById('addModal').classList.toggle('hidden', !s); }
+        function toggleTheme() { document.body.classList.toggle('dark'); document.body.classList.toggle('light'); }
+        function setStatus(s, btn) {
+            selectedStatus = s;
+            document.querySelectorAll('#statusPicker button').forEach(b => b.className = 'p-4 rounded-2xl border border-white/5 text-[10px] font-black uppercase');
+            btn.className = 'p-4 rounded-2xl border border-[#00ff88] text-[10px] font-black uppercase bg-[#00ff88]/10 text-[#00ff88]';
+        }
+        function quickLoad(t, s) { document.getElementById('projTitle').value = t; document.getElementById('projSolution').value = s; toggleSidebar(); toggleModal(true); }
+        function updateClock() { setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000); }
     </script>
 </body>
 </html>
