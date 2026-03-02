@@ -3,187 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pyro | System OS (UI Test)</title>
+    <title>Pyro | Zero Trace Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap');
-        
-        :root { --primary: #00ff88; --bg-dark: #030403; --bg-light: #fcfcfc; }
-        .dark { background-color: var(--bg-dark); color: #f8fafc; }
-        .light { background-color: var(--bg-light); color: #0f172a; }
-        
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s; min-height: 100vh; }
-
-        .bg-watermark {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 22vw; font-weight: 900; letter-spacing: -0.06em;
-            pointer-events: none; z-index: 0; text-transform: uppercase;
-            background: linear-gradient(180deg, #00ff88 0%, #10b981 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.3));
-            animation: pulse-glow 8s ease-in-out infinite;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { background-color: #020302; color: #e5e5e5; font-family: 'Inter', sans-serif; position: relative; overflow-x: hidden; }
+        .pyro-card { background: rgba(10, 18, 10, 0.95); transition: all 0.4s ease; backdrop-filter: blur(15px); border: 1px solid #1a2e1a; }
+        .pyro-card:hover { border-color: #10b981; transform: scale(1.02); }
+        .solution-box { background-color: #000; border: 1px solid #064e3b; position: relative; }
+        .locked-overlay { background: rgba(0,0,0,0.98); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10; border-radius: 0.75rem; }
+        .pyro-watermark {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg);
+            font-size: 35vw; font-weight: 900; color: rgba(16, 185, 129, 0.08);
+            text-transform: uppercase; pointer-events: none; z-index: 0; white-space: nowrap;
         }
-
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.08; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.12; transform: translate(-50%, -50%) scale(1.05); }
-        }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 255, 136, 0.15);
-        }
-        .light .glass-panel { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(16, 185, 129, 0.2); }
-
-        .project-card { transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
-        .status-active { color: #00e0ff; background: rgba(0, 224, 255, 0.1); border: 1px solid rgba(0, 224, 255, 0.2); }
-        .status-pending { color: #ffb800; background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.2); }
-        .status-completed { color: #00ff88; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.2); }
-        
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 10px; }
-        
-        .archive-item { cursor: pointer; transition: all 0.2s; border-left: 2px solid transparent; margin-bottom: 8px; }
-        .archive-item:hover { border-left: 2px solid #00ff88; padding-left: 8px; color: #00ff88; }
     </style>
 </head>
-<body class="dark overflow-x-hidden">
+<body class="min-h-screen pb-20">
 
-    <div class="bg-watermark">PYRO</div>
+    <div class="pyro-watermark">PYRO</div>
 
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] opacity-0 pointer-events-none transition-opacity"></div>
-
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 glass-panel -translate-x-full transition-transform duration-500 z-[1000] flex flex-col">
-        <div class="p-8 border-b border-white/10">
-            <h2 class="font-bold text-xl text-[#00ff88]">ARCHIVE_v4.0</h2>
-            <button onclick="toggleSidebar()" class="absolute top-8 right-8 text-slate-500 hover:text-white">&times;</button>
+    <nav class="relative border-b border-emerald-900/40 p-6 flex flex-wrap justify-between items-center bg-black/95 sticky top-0 z-50 backdrop-blur-md">
+        <div>
+            <h1 class="text-4xl font-black tracking-tighter text-emerald-500 italic leading-none">PYRO</h1>
+            <p id="stats" class="text-[10px] tracking-[0.3em] text-emerald-800 font-bold mt-1">PROTOCOL: SECURE</p>
         </div>
-        <div class="flex-grow overflow-y-auto p-6 space-y-8">
-            <div>
-                <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-4">Genetic & Biological</p>
-                <div class="space-y-2 text-xs text-slate-400">
-                    <div class="archive-item" onclick="quickLoad('Neuro-Synapse', 'Mapping consciousness to mycelium.')">Mycelium Link</div>
-                    <div class="archive-item" onclick="quickLoad('Photosyn-Skin', 'Grafting chlorophyll cells.')">Green Skin Mod</div>
-                    <div class="archive-item" onclick="quickLoad('Abyssal Gills', 'Bronchial oxygen filtration.')">Sea-Lung V2</div>
-                </div>
-            </div>
-            </div>
-    </aside>
-
-    <nav class="sticky top-0 z-50 p-6">
-        <div class="max-w-7xl mx-auto glass-panel rounded-2xl p-4 px-8 flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <button onclick="toggleSidebar()" class="group space-y-1.5 p-2">
-                    <div class="w-6 h-0.5 bg-[#00ff88]"></div>
-                    <div class="w-8 h-0.5 bg-slate-400"></div>
-                </button>
-                <h1 class="text-2xl font-black text-[#00ff88]">PYRO</h1>
-            </div>
-            <div class="flex items-center gap-6">
-                <button onclick="toggleTheme()" id="theme-btn" class="p-2">☀️</button>
-                <button onclick="toggleModal(true)" class="bg-[#00ff88] text-black px-6 py-2 rounded-xl font-bold text-xs uppercase shadow-lg">Initialize</button>
-            </div>
+        <div class="flex items-center gap-3">
+            <input type="text" id="searchInput" oninput="renderProjects()" placeholder="Filter..." class="bg-zinc-900 border border-emerald-900/50 px-4 py-2 rounded-lg text-sm outline-none w-32 sm:w-48 focus:border-emerald-500">
+            <button onclick="exportToPDF()" class="text-emerald-500 text-sm font-bold px-3">PDF</button>
+            <button onclick="toggleModal(true)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg">+ NEW</button>
         </div>
     </nav>
 
-    <main class="relative z-10 max-w-7xl mx-auto p-8">
-        <header class="mb-16 flex justify-between items-end">
-            <div>
-                <h2 class="text-6xl font-black tracking-tighter">Workspace.</h2>
-            </div>
-            <p id="clock" class="text-4xl font-black text-emerald-500 font-mono">00:00:00</p>
-        </header>
-        <div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    <main class="relative p-6 max-w-7xl mx-auto z-10">
+        <div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
-    <div id="addModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 z-[2000]">
-        <div class="glass-panel w-full max-w-xl p-10 rounded-[2.5rem]">
-            <h2 class="text-3xl font-black mb-8 text-white">New Entry</h2>
-            <div class="space-y-6">
-                <input id="projTitle" type="text" placeholder="Entry ID" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none text-white">
-                <div class="grid grid-cols-3 gap-3">
-                    <button onclick="setStatus('Active', this)" class="status-choice p-3 rounded-xl border border-[#00ff88] text-[10px] font-black uppercase">Active</button>
-                    <button onclick="setStatus('Pending', this)" class="status-choice p-3 rounded-xl border border-white/10 text-[10px] font-black uppercase">Pending</button>
-                    <button onclick="setStatus('Completed', this)" class="status-choice p-3 rounded-xl border border-white/10 text-[10px] font-black uppercase">Done</button>
+    <button onclick="selfDestruct()" class="fixed bottom-6 right-6 z-50 bg-red-950/20 hover:bg-red-600 text-red-900 hover:text-white px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all border border-red-900/50">
+        Self Destruct
+    </button>
+
+    <div id="addModal" class="hidden fixed inset-0 bg-black/98 flex items-center justify-center p-4 z-[100]">
+        <div class="bg-zinc-900 w-full max-w-2xl p-8 rounded-3xl border border-emerald-600/30">
+            <h2 class="text-2xl font-bold text-white mb-6 uppercase tracking-tight">New Entry</h2>
+            <div class="grid gap-4">
+                <input id="projTitle" type="text" placeholder="Title" class="w-full bg-black border border-zinc-800 p-4 rounded-xl text-white outline-none">
+                <div class="flex gap-4">
+                    <select id="projTag" class="flex-grow bg-black border border-zinc-800 p-4 rounded-xl text-emerald-500 outline-none">
+                        <option value="Source Code">Source Code</option>
+                        <option value="Logic">Logic</option>
+                        <option value="Design">Design</option>
+                    </select>
+                    <div class="flex items-center gap-2 bg-black border border-zinc-800 px-4 rounded-xl">
+                        <input type="checkbox" id="projLocked" class="accent-emerald-500">
+                        <label class="text-[10px] text-zinc-500 uppercase font-bold">Lock</label>
+                    </div>
                 </div>
-                <textarea id="projSolution" placeholder="Logic payload..." rows="5" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl font-mono text-sm text-white"></textarea>
+                <textarea id="projSolution" placeholder="Data..." rows="8" class="w-full bg-black border border-zinc-800 p-4 rounded-xl font-mono text-emerald-400 outline-none"></textarea>
             </div>
-            <div class="mt-10 flex gap-4">
-                <button onclick="toggleModal(false)" class="flex-1 border border-white/10 text-slate-400 font-black py-5 rounded-xl uppercase">Abort</button>
-                <button onclick="saveLocal()" class="flex-[2] bg-[#00ff88] text-black font-black py-5 rounded-xl uppercase shadow-lg">Save Registry</button>
+            <div class="flex gap-4 mt-8">
+                <button onclick="saveProject()" class="flex-1 bg-emerald-600 p-4 rounded-xl font-bold text-white uppercase italic">Burn to Vault</button>
+                <button onclick="toggleModal(false)" class="px-6 text-zinc-500 font-bold uppercase text-xs">Abort</button>
             </div>
         </div>
     </div>
 
     <script>
-        // UI & LOCAL STORAGE LOGIC (No Firebase Needed)
-        let projects = JSON.parse(localStorage.getItem('pyro_ui_test')) || [];
-        let currentStatus = 'Active';
+        let projects = JSON.parse(localStorage.getItem('pyro_secure_v3')) || [];
+        let masterKey = localStorage.getItem('pyro_master_v3') || null;
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebarOverlay').classList.toggle('opacity-0');
-            document.getElementById('sidebarOverlay').classList.toggle('pointer-events-none');
+        function toggleModal(show) { document.getElementById('addModal').classList.toggle('hidden', !show); }
+
+        function renderProjects() {
+            const container = document.getElementById('projectContainer');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = projects.filter(p => p.title.toLowerCase().includes(searchTerm));
+            document.getElementById('stats').innerText = `${projects.length} RECORDS STORED`;
+
+            container.innerHTML = filtered.map((p, index) => `
+                <div class="pyro-card p-6 rounded-2xl flex flex-col h-full">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-[9px] px-2 py-0.5 rounded border border-emerald-900 text-emerald-500 font-black uppercase mb-1 inline-block">${p.tag}</span>
+                            <h3 class="text-xl font-bold text-white">${p.title}</h3>
+                        </div>
+                        <button onclick="deleteProject(${index})" class="text-zinc-800 hover:text-red-500 text-xs font-bold">DELETE</button>
+                    </div>
+                    <div class="solution-box p-4 rounded-xl text-zinc-300 font-mono text-xs overflow-auto h-48 whitespace-pre-wrap flex-grow">
+                        ${p.locked ? `<div class="locked-overlay" id="lock-${index}"><button onclick="unlockProject(${index})" class="text-emerald-500 text-[10px] font-bold uppercase border border-emerald-900/50 px-4 py-2 rounded-lg hover:bg-emerald-500 hover:text-black">Unlock</button></div>` : ''}
+                        ${p.solution}
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function toggleModal(s) { document.getElementById('addModal').classList.toggle('hidden', !s); }
-
-        function toggleTheme() {
-            const body = document.body;
-            body.classList.toggle('dark');
-            body.classList.toggle('light');
-            document.getElementById('theme-btn').innerText = body.classList.contains('dark') ? '☀️' : '🌙';
-        }
-
-        function setStatus(s, btn) {
-            currentStatus = s;
-            document.querySelectorAll('.status-choice').forEach(b => b.classList.replace('border-[#00ff88]', 'border-white/10'));
-            btn.classList.replace('border-white/10', 'border-[#00ff88]');
-        }
-
-        function quickLoad(t, s) {
-            document.getElementById('projTitle').value = t;
-            document.getElementById('projSolution').value = s;
-            toggleSidebar();
-            toggleModal(true);
-        }
-
-        function saveLocal() {
+        function saveProject() {
             const title = document.getElementById('projTitle').value;
             const solution = document.getElementById('projSolution').value;
+            const tag = document.getElementById('projTag').value;
+            const locked = document.getElementById('projLocked').checked;
+
             if(title && solution) {
-                projects.unshift({ title, solution, status: currentStatus, date: new Date().getTime() });
-                localStorage.setItem('pyro_ui_test', JSON.stringify(projects));
-                render();
+                if(locked && !masterKey) {
+                    masterKey = prompt("Set Master Key:");
+                    if(!masterKey) return;
+                    localStorage.setItem('pyro_master_v3', masterKey);
+                }
+                projects.unshift({ title, solution, tag, locked });
+                syncData();
                 toggleModal(false);
                 document.getElementById('projTitle').value = '';
                 document.getElementById('projSolution').value = '';
+                document.getElementById('projLocked').checked = false;
             }
         }
 
-        function render() {
-            const container = document.getElementById('projectContainer');
-            container.innerHTML = projects.map((p, i) => `
-                <div class="project-card glass-panel p-8 rounded-[1.5rem]">
-                    <div class="flex justify-between items-start mb-6">
-                        <span class="text-[8px] font-black px-2 py-1 rounded status-${p.status.toLowerCase()}">● ${p.status}</span>
-                        <button onclick="deleteLocal(${i})" class="text-slate-600 hover:text-red-500">&times;</button>
-                    </div>
-                    <h3 class="text-xl font-black uppercase mb-4">${p.title}</h3>
-                    <div class="bg-black/20 p-4 rounded-xl font-mono text-xs text-slate-400">${p.solution}</div>
-                </div>`).join('');
+        function unlockProject(index) {
+            if(prompt("Enter Key:") === masterKey) document.getElementById(`lock-${index}`).remove();
+            else alert("DENIED");
         }
 
-        function deleteLocal(i) {
-            projects.splice(i, 1);
-            localStorage.setItem('pyro_ui_test', JSON.stringify(projects));
-            render();
+        function selfDestruct() {
+            if(confirm("CRITICAL: Wipe all vault data?")) {
+                if(prompt("Enter Master Key to Confirm:") === masterKey || !masterKey) {
+                    localStorage.removeItem('pyro_secure_v3');
+                    localStorage.removeItem('pyro_master_v3');
+                    location.reload();
+                } else {
+                    alert("AUTHORIZATION FAILED");
+                }
+            }
         }
 
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-        render();
+        function exportToPDF() {
+            const el = document.createElement('div');
+            el.innerHTML = projects.map(p => `<div><h2>${p.title}</h2><p>${p.locked ? 'ENCRYPTED' : p.solution}</p></div>`).join('');
+            html2pdf().from(el).set({ filename: 'Pyro-Vault-Dump.pdf' }).save();
+        }
+
+        function deleteProject(index) { if(confirm("Delete?")) { projects.splice(index, 1); syncData(); } }
+        function syncData() { localStorage.setItem('pyro_secure_v3', JSON.stringify(projects)); renderProjects(); }
+        renderProjects();
     </script>
 </body>
 </html>
