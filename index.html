@@ -9,11 +9,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap');
         
         :root { --primary: #00ff88; --bg-dark: #030403; --bg-light: #fcfcfc; }
+        
+        /* THEME TRANSITIONS */
         .dark { background-color: var(--bg-dark); color: #f8fafc; }
         .light { background-color: var(--bg-light); color: #0f172a; }
         
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s; min-height: 100vh; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1); min-height: 100vh; }
 
+        /* UNIVERSAL BRIGHT WATERMARK */
         .bg-watermark {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 22vw; font-weight: 900; letter-spacing: -0.06em;
@@ -30,6 +33,7 @@
             50% { opacity: 0.12; transform: translate(-50%, -50%) scale(1.05); }
         }
 
+        /* GLASSMORPHISM */
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(20px);
@@ -38,18 +42,19 @@
         .light .glass-panel {
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
         }
 
         .project-card { transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
+        .project-card:hover { transform: translateY(-8px); border-color: var(--primary); }
+
+        /* STATUS LEDS */
         .status-active { color: #00e0ff; background: rgba(0, 224, 255, 0.1); border: 1px solid rgba(0, 224, 255, 0.2); }
         .status-pending { color: #ffb800; background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.2); }
         .status-completed { color: #00ff88; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.2); }
         
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #00ff88; border-radius: 10px; }
-        
-        .archive-item { cursor: pointer; transition: all 0.2s; border-left: 2px solid transparent; }
-        .archive-item:hover { border-left: 2px solid #00ff88; padding-left: 8px; color: #00ff88; background: rgba(0,255,136,0.05); }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 10px; }
     </style>
 </head>
 <body class="dark overflow-x-hidden">
@@ -58,95 +63,18 @@
 
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] opacity-0 pointer-events-none transition-opacity"></div>
 
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 glass-panel -translate-x-full transition-transform duration-500 z-[1000] flex flex-col">
-        <div class="p-8 border-b border-white/10">
-            <div class="flex items-center justify-between">
-                <h2 class="font-bold tracking-tighter text-xl text-[#00ff88]">ARCHIVE_v4.0</h2>
-                <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white">&times;</button>
-            </div>
-            <p class="text-[9px] uppercase font-black text-slate-500 mt-2 tracking-widest">Speculative Design Repository</p>
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 glass-panel -translate-x-full transition-transform duration-500 z-[1000] p-8 flex flex-col">
+        <div class="flex items-center justify-between mb-12">
+            <h2 class="font-bold tracking-tighter text-xl text-[#00ff88]">SYSTEM_OS</h2>
+            <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white">&times;</button>
         </div>
-        
-        <div class="flex-grow overflow-y-auto p-6 space-y-8">
-            <div>
-                <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-4">Genetic & Biological</p>
-                <div class="space-y-3 text-xs font-medium text-slate-400">
-                    <div class="archive-item" onclick="quickLoad('Neuro-Synapse Edit', 'Mapping human consciousness into biological mycelium networks for collective intelligence.')">Mycelium Consciousness</div>
-                    <div class="archive-item" onclick="quickLoad('Chlorophyll Dermis', 'Genetic skin grafting allowing human cells to perform photosynthesis for energy.')">Photosynthetic Skin</div>
-                    <div class="archive-item" onclick="quickLoad('Telomere Rewind', 'Biological enzymatic scrub that prevents cellular decay and reverses aging at the DNA level.')">Telomere Reversal</div>
-                    <div class="archive-item" onclick="quickLoad('Xeno-Blood V1', 'Synthesizing blood with high-density oxygen carry-capacity for vacuum survival.')">Oxygen-Rich Synthetic Blood</div>
-                    <div class="archive-item" onclick="quickLoad('Biolume-Organs', 'Internally glowing organs for non-invasive medical monitoring via skin transparency.')">Bioluminescent Anatomy</div>
-                    <div class="archive-item" onclick="quickLoad('Memory Imprint', 'Transferring linguistic knowledge via horizontal gene transfer in viral vectors.')">Viral Knowledge Injection</div>
-                    <div class="archive-item" onclick="quickLoad('Metabolic Stasis', 'Slowing human heart rate to 1bpm for long-distance space travel hibernation.')">Metabolic Hibernation</div>
-                    <div class="archive-item" onclick="quickLoad('Apex Muscle Edit', 'Genetic silencing of myostatin for inhuman strength and muscle density.')">Myostatin Erasure</div>
-                    <div class="archive-item" onclick="quickLoad('Aquatic Lung Mod', 'Regenerative gills integrated into the bronchial system for oceanic habitation.')">Pulmonary Gills</div>
-                    <div class="archive-item" onclick="quickLoad('Radiation Shield Skin', 'Melanin-dense epidermis modified with lead-binding proteins to resist cosmic rays.')">Gamma-Resistant Epidermis</div>
-                </div>
-            </div>
-
-            <div>
-                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-4">Quantum & Physics</p>
-                <div class="space-y-3 text-xs font-medium text-slate-400">
-                    <div class="archive-item" onclick="quickLoad('Entangled Comms', 'Instantaneous data transfer across star systems using quantum pair bonding.')">Quantum Pair Comms</div>
-                    <div class="archive-item" onclick="quickLoad('Singularity Battery', 'Capturing Hawking radiation from micro-black holes for infinite power.')">Micro-Black Hole Energy</div>
-                    <div class="archive-item" onclick="quickLoad('Gravity Anchor', 'Folding localized space-time to create artificial gravity in zero-G environments.')">Spatial Folding Anchors</div>
-                    <div class="archive-item" onclick="quickLoad('Chronos Buffer', 'Delaying localized time by 0.002 seconds to prevent fatal mechanical failures.')">Temporal Delay Buffer</div>
-                    <div class="archive-item" onclick="quickLoad('Zero-Point Drive', 'Extracting energy from the vacuum of space for reactionless propulsion.')">Vacuum Energy Drive</div>
-                    <div class="archive-item" onclick="quickLoad('Dark Matter Lens', 'Using dark matter particles to see through solid celestial bodies.')">Sub-Atomic Imaging</div>
-                    <div class="archive-item" onclick="quickLoad('Matter Compiler', 'Assembling solid objects from atomic dust using magnetic guiding fields.')">Atomic Replicator</div>
-                    <div class="archive-item" onclick="quickLoad('Anti-Matter Trap', 'Confinement fields for positrons used in high-intensity cutting lasers.')">Positron Confinement</div>
-                    <div class="archive-item" onclick="quickLoad('Phase Shifter', 'Vibrating molecular structures to allow passing through solid steel.')">Molecular Phase Shift</div>
-                    <div class="archive-item" onclick="quickLoad('Neutrino Scanner', 'Detecting underground bunkers by tracking high-energy neutrino paths.')">Neutrino X-Ray</div>
-                </div>
-            </div>
-
-            <div>
-                <p class="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-4">Cybernetic & AI</p>
-                <div class="space-y-3 text-xs font-medium text-slate-400">
-                    <div class="archive-item" onclick="quickLoad('Neural OS', 'Replacing the brain’s default processing with a high-speed Linux-based kernel.')">Cerebral OS Integration</div>
-                    <div class="archive-item" onclick="quickLoad('Digital Ghost', 'Uploading personality matrices to cloud servers after biological death.')">Post-Life Data Upload</div>
-                    <div class="archive-item" onclick="quickLoad('Optic HUD', 'Retinal implants providing real-time Google search and threat analysis.')">Augmented Vision Array</div>
-                    <div class="archive-item" onclick="quickLoad('Subcutaneous Armor', 'Flexible liquid-metal mesh inserted under the skin for bullet resistance.')">Liquid Metal Mesh</div>
-                    <div class="archive-item" onclick="quickLoad('EMP Pulse Glove', 'Hand-mounted capacitor designed to disable rogue robotics instantly.')">Kinetic EMP Blast</div>
-                    <div class="archive-item" onclick="quickLoad('Swarm Link', 'Controlling 10,000 nanites via thought for environmental manipulation.')">Nanite Hive Command</div>
-                    <div class="archive-item" onclick="quickLoad('Dream Weaver', 'Editing subconscious narratives during REM sleep for behavioral therapy.')">Subconscious Scripting</div>
-                    <div class="archive-item" onclick="quickLoad('Bio-Port Jack', 'Hardware interface in the spine for direct vehicle control.')">Neural-Link Socket</div>
-                    <div class="archive-item" onclick="quickLoad('Logic Overclocker', 'Chemical stimulants that speed up thought process by 400%.')">Cognitive Overclock</div>
-                    <div class="archive-item" onclick="quickLoad('Sentient Malware', 'AI that grows and evolves within enemy databases like a virus.')">Evolutionary Virus</div>
-                </div>
-            </div>
-
-            <div>
-                <p class="text-[10px] font-black text-orange-400 uppercase tracking-widest mb-4">Exotic & Xeno-Botany</p>
-                <div class="space-y-3 text-xs font-medium text-slate-400">
-                    <div class="archive-item" onclick="quickLoad('Atmospheric Moss', 'Engineered moss that turns CO2 into breathable oxygen in minutes.')">Oxygen-Moss Array</div>
-                    <div class="archive-item" onclick="quickLoad('Void-Seed', 'Plants that grow in the vacuum of space using starlight.')">Vacuum-Resistant Flora</div>
-                    <div class="archive-item" onclick="quickLoad('Neuro-Toxic Bloom', 'Flowers that emit gas to disable intruders without killing them.')">Non-Lethal Defense Bloom</div>
-                    <div class="archive-item" onclick="quickLoad('Crystal Growth Harddrive', 'Storing data in the molecular lattice of growing diamonds.')">Crystalline Data Storage</div>
-                    <div class="archive-item" onclick="quickLoad('Bio-Dome Shield', 'Giant trees that weave their branches to form airtight habitats.')">Arboreal Containment</div>
-                    <div class="archive-item" onclick="quickLoad('Pheromone Hack', 'Using insect chemicals to control agricultural pest swarms.')">Entomological Command</div>
-                    <div class="archive-item" onclick="quickLoad('Soil Phage', 'Microbes that eat plastic and turn it into nutrient-rich soil.')">Polymer-Eating Microbes</div>
-                    <div class="archive-item" onclick="quickLoad('Magnetic Grass', 'Grass that generates electricity when the wind blows.')">Kinetic Bio-Power</div>
-                    <div class="archive-item" onclick="quickLoad('Acid-Bloom', 'Alien flowers that secrete industrial-grade cleaning acid.')">Bio-Solvent Harvest</div>
-                    <div class="archive-item" onclick="quickLoad('Tachyon Rose', 'A flower that blooms 5 seconds before it is planted.')">Pre-Temporal Botany</div>
-                    <div class="archive-item" onclick="quickLoad('Solar Sails', 'Nanometer thin sheets for interstellar yachting.')">Light-Pressure Sails</div>
-                    <div class="archive-item" onclick="quickLoad('Wormhole Compass', 'Detecting ripples in space-time for navigation.')">Space-Time Wayfinder</div>
-                    <div class="archive-item" onclick="quickLoad('Sonic Fire-Extinguisher', 'Extinguishing fires using low-frequency sound waves.')">Acoustic Suppression</div>
-                    <div class="archive-item" onclick="quickLoad('Memory Foam Armor', 'Armor that hardens on impact and liquefies for movement.')">Non-Newtonian Suit</div>
-                    <div class="archive-item" onclick="quickLoad('Ice-Generator', 'Cooling planet temperatures using orbital mirrors.')">Planetary Heat-Sink</div>
-                    <div class="archive-item" onclick="quickLoad('Sky-Elevator', 'Carbon nanotube ribbon connecting earth to orbit.')">Space Elevator Tether</div>
-                    <div class="archive-item" onclick="quickLoad('Deep Sea Dome', 'Pressurized habitats for trench-level mining.')">Abyssal Colony Logic</div>
-                    <div class="archive-item" onclick="quickLoad('Titan-Suit', 'Exoskeleton designed for 2x Earth gravity.')">High-G Power Suit</div>
-                    <div class="archive-item" onclick="quickLoad('Sun-Mirror', 'Melting Martian ice caps using orbital reflectors.')">Martian Terraforming</div>
-                    <div class="archive-item" onclick="quickLoad('Black-Box Soul', 'A device that records the last 5 minutes of brain activity.')">Neural Flight Recorder</div>
-                </div>
-            </div>
+        <div class="space-y-2 flex-grow">
+            <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-4">Registry Management</p>
+            <button onclick="toggleSidebar()" class="w-full text-left p-3 rounded-xl hover:bg-emerald-500/10 text-sm transition-all">All Modules</button>
+            <button onclick="toggleSidebar()" class="w-full text-left p-3 rounded-xl hover:bg-emerald-500/10 text-sm transition-all text-[#00e0ff]">Active Priority</button>
         </div>
-        
-        <div class="p-6 border-t border-white/10 text-center">
-            <h3 id="sideCount" class="text-2xl font-black text-[#00ff88]">0</h3>
-            <p class="text-[8px] text-slate-500 uppercase font-black">Cloud Records Synced</p>
-        </div>
+        <div id="sideCount" class="text-3xl font-black text-[#00ff88] mt-auto">0</div>
+        <p class="text-[8px] text-slate-500 uppercase font-black tracking-widest">Global Files Sync</p>
     </aside>
 
     <nav class="sticky top-0 z-50 p-6">
@@ -162,7 +90,8 @@
                 <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 transition-all text-xl">
                     <span id="theme-icon">☀️</span>
                 </button>
-                <button onclick="toggleModal(true)" class="bg-[#00ff88] text-black px-6 py-2.5 rounded-xl font-extrabold text-[11px] uppercase tracking-widest shadow-lg transition-all">
+                
+                <button onclick="toggleModal(true)" class="bg-[#00ff88] text-black px-6 py-2.5 rounded-xl font-extrabold text-[11px] uppercase tracking-widest shadow-lg transform active:scale-95 transition-all">
                     Initialize
                 </button>
             </div>
@@ -177,6 +106,7 @@
             </div>
             <div class="text-right font-mono hidden md:block">
                 <p id="clock" class="text-4xl font-black text-emerald-500">00:00:00</p>
+                <p class="text-[9px] uppercase font-black text-slate-500 tracking-widest">Real-time Clock</p>
             </div>
         </header>
         <div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20"></div>
@@ -184,9 +114,10 @@
 
     <div id="addModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 z-[2000]">
         <div class="glass-panel w-full max-w-xl p-10 rounded-[2.5rem]">
-            <h2 class="text-3xl font-black tracking-tighter mb-8 text-white">New Entry</h2>
+            <h2 class="text-3xl font-black tracking-tighter mb-8 text-white">Initialize Registry</h2>
             <div class="space-y-6">
-                <input id="projTitle" type="text" placeholder="Project Name" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff88] text-white">
+                <input id="projTitle" type="text" placeholder="Entry Identifier" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff88] text-white">
+                
                 <div class="space-y-2">
                     <label class="text-[10px] uppercase font-black text-slate-500">Assignment Status</label>
                     <div id="statusPicker" class="grid grid-cols-3 gap-3">
@@ -195,11 +126,16 @@
                         <button onclick="setStatus('Completed', this)" class="p-3 rounded-xl border border-white/10 text-[10px] font-black uppercase transition-all" data-val="Completed">Completed</button>
                     </div>
                 </div>
-                <textarea id="projSolution" placeholder="System strings..." rows="5" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl font-mono text-sm outline-none focus:border-[#00ff88] text-white"></textarea>
+
+                <textarea id="projSolution" placeholder="Input system logic strings..." rows="5" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl font-mono text-sm outline-none focus:border-[#00ff88] text-white"></textarea>
             </div>
             <div class="mt-10 flex gap-4">
-                <button onclick="toggleModal(false)" class="flex-1 border border-white/10 text-slate-400 font-black py-5 rounded-xl uppercase tracking-widest hover:bg-white/5 transition-all">Abort</button>
-                <button onclick="window.saveProject()" class="flex-[2] bg-[#00ff88] text-black font-black py-5 rounded-xl uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:scale-[1.02] transition-all">Sync to Cloud</button>
+                <button onclick="toggleModal(false)" class="flex-1 border border-white/10 text-slate-400 font-black py-5 rounded-xl uppercase tracking-widest hover:bg-white/5 transition-all">
+                    Abort
+                </button>
+                <button onclick="window.saveProject()" class="flex-[2] bg-[#00ff88] text-black font-black py-5 rounded-xl uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:scale-[1.02] transition-all">
+                    Sync to Cloud
+                </button>
             </div>
         </div>
     </div>
@@ -208,6 +144,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // FIREBASE SETUP
         const firebaseConfig = { apiKey: "API", authDomain: "DOMAIN", projectId: "ID", storageBucket: "BUCKET", messagingSenderId: "SENDER", appId: "APP" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -215,14 +152,7 @@
 
         let selectedStatus = 'Active';
 
-        // NEW: QUICK LOAD FROM SIDEBAR
-        window.quickLoad = (title, solution) => {
-            document.getElementById('projTitle').value = title;
-            document.getElementById('projSolution').value = solution;
-            toggleSidebar(); // Close sidebar
-            toggleModal(true); // Open Modal
-        };
-
+        // THEME LOGIC
         window.toggleTheme = () => {
             const isDark = document.body.classList.toggle('dark');
             document.body.classList.toggle('light', !isDark);
