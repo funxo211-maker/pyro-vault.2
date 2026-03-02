@@ -145,6 +145,14 @@
         function deleteProject(index) { if(confirm("Delete?")) { projects.splice(index, 1); syncData(); } }
         function syncData() { localStorage.setItem('pyro_secure_v3', JSON.stringify(projects)); renderProjects(); }
         renderProjects();
-    </script>
+    const firebaseConfig = {
+  apiKey: "AIzaSyB9geDTQNqR1GkaLfKuvidhSi4X7CCZJWk",
+  authDomain: "pyrovault2-9927d.firebaseapp.com",
+  projectId: "pyrovault2-9927d",
+  storageBucket: "pyrovault2-9927d.firebasestorage.app",
+  messagingSenderId: "931696004962",
+  appId: "1:931696004962:web:1a35f65e45ca4a7332263b"
+};
 </body>
+
 </html>
