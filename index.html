@@ -8,92 +8,98 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap');
         
-        :root { --primary: #00ff88; --bg-dark: #030403; --bg-light: #fcfcfc; }
+        :root { --primary: #10b981; }
+        .dark { background-color: #050505; color: #f8fafc; }
+        .light { background-color: #ffffff; color: #0f172a; }
         
-        /* THEME TRANSITIONS */
-        .dark { background-color: var(--bg-dark); color: #f8fafc; }
-        .light { background-color: var(--bg-light); color: #0f172a; }
-        
-        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1); min-height: 100vh; }
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            transition: background 0.4s, color 0.4s; 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-        /* UNIVERSAL BRIGHT WATERMARK */
+        /* Large Background Watermark */
         .bg-watermark {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 22vw; font-weight: 900; letter-spacing: -0.06em;
-            pointer-events: none; z-index: 0; text-transform: uppercase;
-            background: linear-gradient(180deg, #00ff88 0%, #10b981 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(0, 255, 136, 0.3));
-            animation: pulse-glow 8s ease-in-out infinite;
+            font-size: 25vw; font-weight: 900; letter-spacing: -0.05em;
+            pointer-events: none; z-index: 0; text-transform: uppercase; transition: all 0.4s;
         }
+        .dark .bg-watermark { color: rgba(255,255,255,0.03); }
+        .light .bg-watermark { color: rgba(0,0,0,0.02); }
 
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.08; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.12; transform: translate(-50%, -50%) scale(1.05); }
-        }
-
-        /* GLASSMORPHISM */
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(0, 255, 136, 0.15);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(16, 185, 129, 0.1);
         }
-        .light .glass-panel {
-            background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+        .light .glass-panel { 
+            background: rgba(255, 255, 255, 0.85); 
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
         }
 
-        .project-card { transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
-        .project-card:hover { transform: translateY(-8px); border-color: var(--primary); }
-
-        /* STATUS LEDS */
-        .status-active { color: #00e0ff; background: rgba(0, 224, 255, 0.1); border: 1px solid rgba(0, 224, 255, 0.2); }
-        .status-pending { color: #ffb800; background: rgba(255, 184, 0, 0.1); border: 1px solid rgba(255, 184, 0, 0.2); }
-        .status-completed { color: #00ff88; background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.2); }
-        
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #1a1a1a; border-radius: 10px; }
+        #sidebar { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; }
+        .stat-card { background: rgba(16, 185, 129, 0.05); border-radius: 1rem; padding: 1rem; border: 1px solid rgba(16, 185, 129, 0.1); }
     </style>
 </head>
-<body class="dark overflow-x-hidden">
+<body class="dark">
 
     <div class="bg-watermark">PYRO</div>
 
-    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] opacity-0 pointer-events-none transition-opacity"></div>
-
-    <aside id="sidebar" class="fixed top-0 left-0 h-full w-80 glass-panel -translate-x-full transition-transform duration-500 z-[1000] p-8 flex flex-col">
-        <div class="flex items-center justify-between mb-12">
-            <h2 class="font-bold tracking-tighter text-xl text-[#00ff88]">SYSTEM_OS</h2>
-            <button onclick="toggleSidebar()" class="text-slate-500 hover:text-white">&times;</button>
-        </div>
-        <div class="space-y-2 flex-grow">
-            <p class="text-[10px] uppercase font-black text-slate-500 tracking-widest mb-4">Registry Management</p>
-            <button onclick="toggleSidebar()" class="w-full text-left p-3 rounded-xl hover:bg-emerald-500/10 text-sm transition-all">All Modules</button>
-            <button onclick="toggleSidebar()" class="w-full text-left p-3 rounded-xl hover:bg-emerald-500/10 text-sm transition-all text-[#00e0ff]">Active Priority</button>
-        </div>
-        <div id="sideCount" class="text-3xl font-black text-[#00ff88] mt-auto">0</div>
-        <p class="text-[8px] text-slate-500 uppercase font-black tracking-widest">Global Files Sync</p>
-    </aside>
-
-    <nav class="sticky top-0 z-50 p-6">
-        <div class="max-w-7xl mx-auto glass-panel rounded-2xl p-4 px-8 flex items-center justify-between">
-            <div class="flex items-center gap-8">
-                <button onclick="toggleSidebar()" class="group space-y-1.5 p-2">
-                    <div class="w-6 h-0.5 bg-[#00ff88] transition-all group-hover:w-8"></div>
-                    <div class="w-8 h-0.5 bg-slate-400"></div>
-                </button>
-                <h1 class="text-2xl font-black tracking-tighter italic text-[#00ff88]">PYRO</h1>
+    <div id="sidebar" class="fixed top-0 left-0 h-full w-72 glass-panel -translate-x-full p-8 flex flex-col">
+        <div class="flex justify-between items-center mb-12">
+            <div>
+                <h2 class="font-black text-emerald-500 text-xl tracking-tighter">CORE_MENU</h2>
+                <p class="text-[9px] uppercase font-bold text-slate-500 tracking-widest">System Management</p>
             </div>
+            <button onclick="toggleSidebar()" class="text-3xl hover:text-emerald-500 transition-colors">&times;</button>
+        </div>
+
+        <div class="space-y-4 mb-auto">
+            <p class="text-[10px] font-black uppercase text-emerald-800 tracking-widest">Live Statistics</p>
+            <div class="stat-card">
+                <p class="text-[10px] font-bold text-slate-500 uppercase">Total Records</p>
+                <h4 id="sideCount" class="text-2xl font-black text-emerald-500">0</h4>
+            </div>
+            <div class="stat-card">
+                <p class="text-[10px] font-bold text-slate-500 uppercase">System Status</p>
+                <h4 class="text-sm font-black text-emerald-500 uppercase flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span> Optimal
+                </h4>
+            </div>
+        </div>
+
+        <nav class="space-y-6 mt-10">
+            <a href="#" class="block font-bold text-lg hover:text-emerald-500 transition">History Log</a>
+            <a href="#" class="block font-bold text-lg hover:text-emerald-500 transition">Security Settings</a>
+            <div class="pt-8 border-t border-emerald-500/10">
+                <p class="text-[9px] font-black uppercase tracking-widest text-slate-600">Built by Pyro_OS Team</p>
+            </div>
+        </nav>
+    </div>
+
+    <nav class="sticky top-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto glass-panel rounded-[2rem] p-3 px-6 flex items-center justify-between shadow-sm">
             <div class="flex items-center gap-6">
+                <button onclick="toggleSidebar()" class="p-2 hover:bg-emerald-500/10 rounded-xl transition-all">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <h1 class="text-2xl font-black tracking-tighter text-emerald-500 italic">PYRO</h1>
+                
+                <div class="hidden md:flex items-center bg-black/10 dark:bg-black/40 border border-emerald-500/10 px-4 py-2 rounded-full gap-3 transition-all focus-within:border-emerald-500">
+                    <span class="font-mono text-emerald-600 text-xs font-bold">G:\></span>
+                    <form action="https://www.google.com/search" method="GET" target="_blank">
+                        <input type="text" name="q" placeholder="Global AI Search..." class="bg-transparent text-sm font-medium outline-none w-56">
+                    </form>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-4">
                 <button onclick="toggleTheme()" class="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 transition-all text-xl">
                     <span id="theme-icon">☀️</span>
                 </button>
-                
-                <button onclick="toggleModal(true)" class="bg-[#00ff88] text-black px-6 py-2.5 rounded-xl font-extrabold text-[11px] uppercase tracking-widest shadow-lg transform active:scale-95 transition-all">
-                    Initialize
-                </button>
+                <button onclick="toggleModal(true)" class="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase shadow-xl hover:scale-105 active:scale-95 transition-all">START_PROJECT</button>
             </div>
         </div>
     </nav>
@@ -101,41 +107,29 @@
     <main class="relative z-10 max-w-7xl mx-auto p-8 pt-12">
         <header class="mb-16 flex justify-between items-end">
             <div>
-                <p class="text-[10px] uppercase font-black tracking-[0.4em] text-[#00ff88] mb-2">Registry Lifecycle Active</p>
-                <h2 class="text-6xl font-black tracking-tighter">Workspace.</h2>
+                <p class="text-[10px] uppercase font-black tracking-[0.4em] text-emerald-500 mb-2">Cloud Registry Active</p>
+                <h2 class="text-6xl font-black tracking-tighter dark:text-white text-slate-900">Workspace.</h2>
             </div>
-            <div class="text-right font-mono hidden md:block">
-                <p id="clock" class="text-4xl font-black text-emerald-500">00:00:00</p>
-                <p class="text-[9px] uppercase font-black text-slate-500 tracking-widest">Real-time Clock</p>
+            <div class="hidden lg:block text-right">
+                <p id="clock" class="text-3xl font-black font-mono text-emerald-500">00:00:00</p>
+                <p class="text-[9px] uppercase font-black text-slate-500 tracking-widest">Local System Time</p>
             </div>
         </header>
-        <div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20"></div>
+
+        <div id="projectContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
     </main>
 
-    <div id="addModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center p-4 z-[2000]">
-        <div class="glass-panel w-full max-w-xl p-10 rounded-[2.5rem]">
-            <h2 class="text-3xl font-black tracking-tighter mb-8 text-white">Initialize Registry</h2>
+    <div id="addModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4 z-[2000]">
+        <div class="glass-panel w-full max-w-xl p-12 rounded-[3.5rem] shadow-2xl">
+            <h2 class="text-4xl font-black mb-10 tracking-tighter">Initialize.</h2>
             <div class="space-y-6">
-                <input id="projTitle" type="text" placeholder="Entry Identifier" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl outline-none focus:border-[#00ff88] text-white">
-                
-                <div class="space-y-2">
-                    <label class="text-[10px] uppercase font-black text-slate-500">Assignment Status</label>
-                    <div id="statusPicker" class="grid grid-cols-3 gap-3">
-                        <button onclick="setStatus('Active', this)" class="p-3 rounded-xl border border-white/10 text-[10px] font-black uppercase transition-all bg-white/5 border-[#00ff88]" data-val="Active">Active</button>
-                        <button onclick="setStatus('Pending', this)" class="p-3 rounded-xl border border-white/10 text-[10px] font-black uppercase transition-all" data-val="Pending">Pending</button>
-                        <button onclick="setStatus('Completed', this)" class="p-3 rounded-xl border border-white/10 text-[10px] font-black uppercase transition-all" data-val="Completed">Completed</button>
-                    </div>
-                </div>
-
-                <textarea id="projSolution" placeholder="Input system logic strings..." rows="5" class="w-full bg-white/5 border border-white/10 p-4 rounded-xl font-mono text-sm outline-none focus:border-[#00ff88] text-white"></textarea>
+                <input id="projTitle" type="text" placeholder="Identifier Name" class="w-full bg-slate-100 dark:bg-black/50 border border-emerald-500/10 p-6 rounded-2xl outline-none focus:border-emerald-500 transition-all">
+                <textarea id="projSolution" placeholder="Solution Logic..." rows="6" class="w-full bg-slate-100 dark:bg-black/50 border border-emerald-500/10 p-6 rounded-2xl font-mono text-sm outline-none focus:border-emerald-500 transition-all"></textarea>
             </div>
-            <div class="mt-10 flex gap-4">
-                <button onclick="toggleModal(false)" class="flex-1 border border-white/10 text-slate-400 font-black py-5 rounded-xl uppercase tracking-widest hover:bg-white/5 transition-all">
-                    Abort
-                </button>
-                <button onclick="window.saveProject()" class="flex-[2] bg-[#00ff88] text-black font-black py-5 rounded-xl uppercase tracking-widest shadow-[0_0_20px_rgba(0,255,136,0.3)] hover:scale-[1.02] transition-all">
-                    Sync to Cloud
-                </button>
+            <div class="mt-12 flex gap-4">
+                <button onclick="window.saveProject()" class="flex-1 bg-emerald-600 text-white font-black py-6 rounded-2xl uppercase tracking-[0.2em] shadow-2xl">Sync to Cloud</button>
+                <button onclick="toggleModal(false)" class="px-8 font-black text-slate-500 uppercase text-xs">Close</button>
             </div>
         </div>
     </div>
@@ -145,85 +139,69 @@
         import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // FIREBASE SETUP
-        const firebaseConfig = { apiKey: "API", authDomain: "DOMAIN", projectId: "ID", storageBucket: "BUCKET", messagingSenderId: "SENDER", appId: "APP" };
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_DOMAIN",
+            projectId: "YOUR_ID",
+            storageBucket: "YOUR_BUCKET",
+            messagingSenderId: "YOUR_SENDER",
+            appId: "YOUR_APP_ID"
+        };
+
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const projectsRef = collection(db, "projects");
 
-        let selectedStatus = 'Active';
-
-        // THEME LOGIC
-        window.toggleTheme = () => {
-            const isDark = document.body.classList.toggle('dark');
-            document.body.classList.toggle('light', !isDark);
-            document.getElementById('theme-icon').innerText = isDark ? '☀️' : '🌙';
-        };
-
-        window.setStatus = (s, btn) => {
-            selectedStatus = s;
-            document.querySelectorAll('#statusPicker button').forEach(b => b.classList.remove('bg-white/10', 'border-[#00ff88]'));
-            btn.classList.add('bg-white/10', 'border-[#00ff88]');
-        };
-
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-            document.getElementById('sidebarOverlay').classList.toggle('opacity-0');
-            document.getElementById('sidebarOverlay').classList.toggle('pointer-events-none');
-        };
+        // UI Core
+        window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('-translate-x-full');
         window.toggleModal = (s) => document.getElementById('addModal').classList.toggle('hidden', !s);
         
-        function timeSince(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            let interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + "h ago";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + "m ago";
-            return "Just now";
-        }
+        window.toggleTheme = () => {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            if(body.classList.contains('dark')) {
+                body.classList.replace('dark', 'light');
+                icon.innerText = '🌙';
+            } else {
+                body.classList.replace('light', 'dark');
+                icon.innerText = '☀️';
+            }
+        };
 
-        setInterval(() => { 
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', { hour12: false }); 
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
         }, 1000);
 
+        // Firebase Sync & Analytics
         onSnapshot(query(projectsRef, orderBy("date", "desc")), (snap) => {
             const projects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             document.getElementById('sideCount').innerText = projects.length;
-            render(projects);
-        });
-
-        function render(items) {
+            
             const container = document.getElementById('projectContainer');
-            container.innerHTML = items.map(p => `
-                <div class="project-card glass-panel p-8 rounded-[1.5rem] flex flex-col h-full">
+            container.innerHTML = projects.map(p => `
+                <div class="glass-panel p-8 rounded-[2.5rem] hover:scale-[1.03] transition-all border-emerald-500/5 hover:border-emerald-500/30">
                     <div class="flex justify-between items-start mb-6">
-                        <div class="space-y-2">
-                            <span class="text-[8px] font-black px-2 py-1 rounded status-${p.status.toLowerCase()} uppercase tracking-widest">● ${p.status}</span>
-                            <h3 class="text-xl font-black tracking-tight uppercase dark:text-white text-slate-900">${p.title}</h3>
-                        </div>
-                        <button onclick="window.deleteItem('${p.id}')" class="text-slate-700 hover:text-red-500 transition-colors">&times;</button>
+                        <h3 class="text-2xl font-black tracking-tighter uppercase">${p.title}</h3>
+                        <button onclick="window.deleteItem('${p.id}')" class="text-slate-500 hover:text-red-500 transition-colors">&times;</button>
                     </div>
-                    <div class="bg-black/10 dark:bg-black/40 border border-emerald-500/5 p-5 rounded-xl font-mono text-[11px] dark:text-slate-400 text-slate-600 flex-grow mb-4">
+                    <div class="bg-slate-100 dark:bg-black/30 p-5 rounded-2xl font-mono text-xs leading-relaxed text-emerald-600 dark:text-emerald-400">
                         ${p.solution}
                     </div>
-                    <div class="flex items-center justify-between border-t border-emerald-500/10 pt-4">
-                        <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Temporal Log</p>
-                        <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">${timeSince(p.date)}</p>
-                    </div>
                 </div>`).join('');
-        }
+        });
 
         window.saveProject = async () => {
             const title = document.getElementById('projTitle').value;
             const solution = document.getElementById('projSolution').value;
             if(title && solution) {
-                await addDoc(projectsRef, { title, solution, status: selectedStatus, date: new Date().getTime() });
+                await addDoc(projectsRef, { title, solution, date: new Date().getTime() });
                 toggleModal(false);
                 document.getElementById('projTitle').value = '';
                 document.getElementById('projSolution').value = '';
             }
         };
 
-        window.deleteItem = async (id) => { if(confirm("Incinerate record?")) await deleteDoc(doc(db, "projects", id)); };
+        window.deleteItem = async (id) => { if(confirm("Incinerate?")) await deleteDoc(doc(db, "projects", id)); };
     </script>
 </body>
 </html>
